@@ -206,20 +206,18 @@ void calculateFoerstnerWeightIsotropy(const cv::Mat_<float>& A00, const cv::Mat_
 {
     weight.create(A00.rows, A00.cols);
     isotropy.create(A00.rows, A00.cols);
-
-    for (int i = 0; i < A00.rows; i++) {
-        for (int j = 0; j < A00.cols; j++) {
-            // Calculate determinant and trace of the structure tensor
-            float detA = A00.at<float>(i, j) * A11.at<float>(i, j) - A01.at<float>(i, j) * A01.at<float>(i, j);
-            float traceA = A00.at<float>(i, j) + A11.at<float>(i, j);
-
-            // Calculate the weight and isotropy
-            weight.at<float>(i, j) = detA / traceA;
-            isotropy.at<float>(i, j) = traceA > 0 ? (traceA * traceA) / detA : 0;
+    for (int i = 0; i < weight.rows; i++){
+        for (int j = 0; j < weight.cols; j++){
+            weight.at<float>(i,j) = (A00.at<float>(i,j)*A11.at<float>(i,j)-A01.at<float>(i,j)*A01.at<float>(i,j))/
+            std::max((A00.at<float>(i,j)+A11.at<float>(i,j)), 1e-8f);
+            isotropy.at<float>(i,j) = 4*(A00.at<float>(i,j)*A11.at<float>(i,j)-A01.at<float>(i,j)*A01.at<float>(i,j))
+            /std::max( ( (A00.at<float>(i,j)+A11.at<float>(i,j))
+                    *(A00.at<float>(i,j)+A11.at<float>(i,j)) ), 1e-8f);;
         }
     }
+    
+    // TO DO !!!
 }
-
 
 
 /**
